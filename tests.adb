@@ -38,9 +38,6 @@ procedure Tests is
    
    Data_Single_F : constant Dataset := ((1.0,), (2.0,), (3.0,), (4.0,));
    Lbls_Single_F : constant Labels := (-1, -1, 1, 1);
-   
-   Data_Empty : constant Dataset (1 .. 0, 1 .. 2) := (others => (others => 0.0));
-   Lbls_Empty : constant Labels (1 .. 0) := (others => 1);
 
 begin
    Put_Line ("TEST 1 — Normal Separable 2D Dataset (Nu=0.5)");
@@ -121,6 +118,7 @@ begin
       declare
          Lbls_Bad : constant Labels := (-1, 1);
          M_Mod    : constant Model := Train (Data_Sep, Lbls_Bad, 0.5, 10);
+         pragma Warnings (Off, M_Mod);
       begin
          Check ("8.1 Should have raised Precondition fail", False);
       end;
@@ -135,6 +133,7 @@ begin
    begin
       declare
          M_Mod : constant Model := Train (Data_Sep, Lbls_Sep, 0.0, 10);
+         pragma Warnings (Off, M_Mod);
       begin
          Check ("9.1 Should have raised Precondition fail", False);
       end;
@@ -148,10 +147,8 @@ begin
    Put_Line ("TEST 10 — Exception on Invalid Max_Iter");
    begin
       declare
-         -- Model constraint Max_Size must be >= Size.
-         -- Ada allows natural bounds, but our Pre requires Max_Iter > 0? No, Max_Iter is Positive.
-         -- Passing 0 to a Positive parameter directly raises Constraint_Error in Ada.
          M_Mod : Model (Max_Size => 0);
+         pragma Warnings (Off, M_Mod);
       begin
          M_Mod := Train (Data_Sep, Lbls_Sep, 0.5, 0);
          Check ("10.1 Should have raised Constraint_Error", False);
@@ -165,13 +162,11 @@ begin
 
    Put_Line ("TEST 11 — Convergence via Error Bounds");
    declare
-      -- Given a completely contradictory dataset, error will instantly be 0.5
       Data_Contradict : constant Dataset := ((1.0,), (1.0,));
       Lbls_Contradict : constant Labels := (1, -1);
       M_Mod : constant Model := Train (Data_Contradict, Lbls_Contradict, 1.0, 5);
    begin
       Check ("11.1 Algorithm halts early on contradictory data", M_Mod.Size < 5);
-      -- It should actually halt at Iteration 1 because stumps can't split it.
       Check ("11.2 Evaluates gracefully", True);
       Check ("11.3 Weights remain safe", True);
    end;
