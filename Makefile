@@ -9,7 +9,7 @@ all: $(BIN_DIR)/tests
 
 $(BIN_DIR)/tests: *.ads *.adb *.gpr
 	mkdir -p $(OBJ_DIR) $(BIN_DIR)
-	$(GNAT) $(FLAGS) -PLpboost.gpr
+	$(GNAT) $(FLAGS) -Plpboost.gpr
 
 test: all
 	@echo "Running tests..."
