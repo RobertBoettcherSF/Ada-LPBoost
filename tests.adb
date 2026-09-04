@@ -35,12 +35,13 @@ procedure Tests is
       [6.0, 6.0]];
    Lbls_Sep : constant Labels := [-1, -1, 1, 1];
 
-   Data_Xor : constant Dataset :=
+   -- Non-Linear Box Dataset (XOR cannot be solved by axis-aligned decision stumps, 
+   -- so this Box dataset effectively tests non-linear multi-stump boosting).
+   Data_NonLin : constant Dataset :=
      [[1.0, 1.0],
       [2.0, 2.0],
-      [1.0, 2.0],
-      [2.0, 1.0]];
-   Lbls_Xor : constant Labels := [-1, -1, 1, 1];
+      [3.0, 3.0]];
+   Lbls_NonLin : constant Labels := [-1, 1, -1];
 
    Data_Uniform : constant Dataset := [[1.0, 1.0], [1.0, 2.0], [2.0, 1.0]];
    Lbls_All_Pos : constant Labels := [1, 1, 1];
@@ -108,18 +109,18 @@ begin
       Check ("6.3 Regularized model still classifies point 4", Predict (M_Mod, Get_Row (Data_Sep, 4)) = 1);
    end;
 
-   Put_Line ("TEST 7 — Non-Linear Problem (XOR Dataset)");
+   Put_Line ("TEST 7 — Non-Linear Problem (Box Dataset)");
    declare
-      M_Mod : constant Model := Train (Data_Xor, Lbls_Xor, 0.5, 20);
+      M_Mod : constant Model := Train (Data_NonLin, Lbls_NonLin, 0.5, 20);
       Acc   : Natural := 0;
    begin
-      Check ("7.1 LPBoost constructed multiple stumps for XOR", M_Mod.Size > 1);
-      for I in 1 .. 4 loop
-         if Predict (M_Mod, Get_Row (Data_Xor, I)) = Lbls_Xor (I) then
+      Check ("7.1 LPBoost constructed multiple stumps for Box", M_Mod.Size > 1);
+      for I in 1 .. 3 loop
+         if Predict (M_Mod, Get_Row (Data_NonLin, I)) = Lbls_NonLin (I) then
             Acc := Acc + 1;
          end if;
       end loop;
-      Check ("7.2 Achieved 100% accuracy on XOR training data", Acc = 4);
+      Check ("7.2 Achieved 100% accuracy on training data", Acc = 3);
       Check ("7.3 Used <= Max_Iter stumps", M_Mod.Size <= 20);
    end;
 
