@@ -111,7 +111,10 @@ begin
 
    Put_Line ("TEST 7 — Non-Linear Problem (Box Dataset)");
    declare
-      M_Mod : constant Model := Train (Data_NonLin, Lbls_NonLin, 0.5, 20);
+      -- Reduced Nu to 0.05. A smaller Nu imposes a stronger hard-margin penalty. 
+      -- At 0.5, the LP solver found it "cheaper" to penalize one misclassified point 
+      -- than to build the 3 necessary stumps to perfectly separate the set.
+      M_Mod : constant Model := Train (Data_NonLin, Lbls_NonLin, 0.05, 20);
       Acc   : Natural := 0;
    begin
       Check ("7.1 LPBoost constructed multiple stumps for Box", M_Mod.Size > 1);
