@@ -29,10 +29,10 @@ package LPBoost with Spark_Mode => On is
 
    -- A decision stump acts as our weak learner
    type Weak_Hypothesis is record
-      Feature   : Positive;
-      Threshold : Real;
-      Polarity  : Integer; -- +1 or -1
-      Weight    : Real;    -- Alpha assigned by LPBoost
+      Feature   : Positive := 1;
+      Threshold : Real := 0.0;
+      Polarity  : Integer := 1;
+      Weight    : Real := 0.0;
    end record;
 
    type Hypothesis_Array is array (Positive range <>) of Weak_Hypothesis;
