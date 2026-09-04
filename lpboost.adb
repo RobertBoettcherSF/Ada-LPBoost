@@ -163,7 +163,8 @@ package body LPBoost is
          Alphas (K) := 0.0;
       end loop;
       for I in 1 .. M loop
-         if Basic_Var (I) >= Col_Alpha + 1 and Basic_Var (I) <= Col_Alpha + J then
+         -- Basic_Var is Positive, so it is natively >= 1. We only need the upper bound.
+         if Basic_Var (I) <= Col_Alpha + J then
             Alphas (Basic_Var (I) - Col_Alpha) := T (I, Col_RHS);
          end if;
       end loop;
@@ -247,6 +248,25 @@ package body LPBoost is
             if Err >= 0.5 - 1.0e-5 then
                exit;
             end if;
+            
+            -- If the hypothesis is already present, the master problem is fully optimal.
+            declare
+               Is_Duplicate : Boolean := False;
+            begin
+               for K in 1 .. Result.Size loop
+                  if Result.Hypotheses (K).Feature = H.Feature
+                    and then abs (Result.Hypotheses (K).Threshold - H.Threshold) < 1.0e-9
+                    and then Result.Hypotheses (K).Polarity = H.Polarity
+                  then
+                     Is_Duplicate := True;
+                     exit;
+                  end if;
+               end loop;
+               
+               if Is_Duplicate then
+                  exit; -- Converged early; LP master optimization is complete
+               end if;
+            end;
             
             Result.Size := Iter;
             Result.Hypotheses (Iter) := H;
