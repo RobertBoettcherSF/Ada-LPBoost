@@ -157,12 +157,14 @@ begin
    Put_Line ("TEST 10 — Exception on Invalid Max_Iter");
    begin
       declare
-         Zero  : Natural := 0;
-         M_Mod : Model (Max_Size => Zero);
+         -- Use 'Value to evaluate "0" dynamically. This completely bypasses GNAT's
+         -- static analysis phase, preventing both the "not modified" constant warning 
+         -- and the static Constraint_Error compiler warnings.
+         Invalid_Iter : constant Natural := Natural'Value ("0");
+         M_Mod : Model (Max_Size => Invalid_Iter);
          pragma Warnings (Off, M_Mod);
       begin
-         -- Using variable Zero prevents compile-time static Constraint_Error warnings
-         M_Mod := Train (Data_Sep, Lbls_Sep, 0.5, Zero);
+         M_Mod := Train (Data_Sep, Lbls_Sep, 0.5, Invalid_Iter);
          Check ("10.1 Should have raised Constraint_Error", False);
       end;
    exception
