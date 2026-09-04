@@ -21,11 +21,11 @@ package body LPBoost is
       J : constant Positive := Iter;
       
       -- Column Offsets
-      Col_Alpha   : constant Positive := 0;
-      Col_Xi      : constant Positive := J;
-      Col_Surplus : constant Positive := J + M;
-      Col_Artif   : constant Positive := J + 2 * M;
-      Col_RHS     : constant Positive := J + 3 * M + 1;
+      Col_Alpha   : constant Natural := 0;
+      Col_Xi      : constant Natural := J;
+      Col_Surplus : constant Natural := J + M;
+      Col_Artif   : constant Natural := J + 2 * M;
+      Col_RHS     : constant Natural := J + 3 * M + 1;
       
       -- Tableau: Rows 1..M (Constraints), M+1 (Phase 1 Obj), M+2 (Phase 2 Obj)
       type Tableau_Type is array (1 .. M + 2, 1 .. Col_RHS) of Real;
@@ -37,8 +37,8 @@ package body LPBoost is
       C_Val : constant Real := 1.0 / (Nu * Real (M));
 
       procedure Do_Phase (Obj_Row : Positive; Start_Col, End_Col : Positive) is
-         Entering : Positive;
-         Leaving  : Positive;
+         Entering : Natural;
+         Leaving  : Natural;
          Min_Val  : Real;
          Min_Ratio: Real;
          Ratio    : Real;
