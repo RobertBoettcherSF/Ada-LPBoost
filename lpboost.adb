@@ -13,11 +13,12 @@ package body LPBoost is
    procedure Solve_Master_Problem
      (H_Mat  : H_Matrix_Type;
       Nu     : Real;
+      Iter   : Positive;
       U      : out Distribution;
-      Alphas : out Distribution)
+      Alphas : in out Distribution)
    is
       M : constant Positive := H_Mat'Length (1);
-      J : constant Positive := H_Mat'Length (2);
+      J : constant Positive := Iter;
       
       -- Column Offsets
       Col_Alpha   : constant Positive := 0;
@@ -28,7 +29,7 @@ package body LPBoost is
       
       -- Tableau: Rows 1..M (Constraints), M+1 (Phase 1 Obj), M+2 (Phase 2 Obj)
       type Tableau_Type is array (1 .. M + 2, 1 .. Col_RHS) of Real;
-      T : Tableau_Type := (others => (others => 0.0));
+      T : Tableau_Type := [others => [others => 0.0]];
       
       -- Keeps track of which variable is basic in which row constraint
       Basic_Var : array (1 .. M) of Positive;
@@ -220,11 +221,11 @@ package body LPBoost is
       Max_Iter : Positive) return Model
    is
       M : constant Positive := Data'Length (1);
-      U : Distribution (1 .. M) := (others => 1.0 / Real (M));
+      U : Distribution (1 .. M) := [others => 1.0 / Real (M)];
       
       Result : Model (Max_Size => Max_Iter);
-      H_Mat  : H_Matrix_Type (1 .. M, 1 .. Max_Iter) := (others => (others => 0.0));
-      Alphas : Distribution (1 .. Max_Iter) := (others => 0.0);
+      H_Mat  : H_Matrix_Type (1 .. M, 1 .. Max_Iter) := [others => [others => 0.0]];
+      Alphas : Distribution (1 .. Max_Iter) := [others => 0.0];
       
       Err : Real;
       Pred : Integer;
@@ -258,10 +259,11 @@ package body LPBoost is
             
             -- Solve Totally Corrective LP
             Solve_Master_Problem (
-               H_Mat  => H_Mat (1 .. M, 1 .. Iter),
+               H_Mat  => H_Mat,
                Nu     => Nu,
+               Iter   => Iter,
                U      => U,
-               Alphas => Alphas (1 .. Iter)
+               Alphas => Alphas
             );
             
             -- Assign updated LP weights to the ensemble
